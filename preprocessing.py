@@ -22,22 +22,41 @@ C_WHITE = "\033[37m "
 C_YELLOW = "\033[33m "
 C_END = " \033[0m"
 
+
 class Preprocessing:
-    def __init__(self, path_data: str, params: dict):
+    def __init__(self, path_data: str = './data/', params: dict = None):
         self.docs_list = None
         self.vector_columns = None
         self.path_data = path_data
-        self.params = params
-
-        self.encoding = params['coder']  # one_hot or bag_of_words or tfidf
-        self.stemm = params['stemming']
-        self.lemm = params['lemmatization']
-        self.miss = params['misspellings']
-        self.punct = params['punctuation']
-        self.stop_words = params['stop_words']
-        self.descr = params['description']
-        self.lower = params['lower_case']
-        self.nbr_ex = params['chose_example']
+        self.encoding = None
+        self.stemm = None
+        self.lemm = None
+        self.miss = None
+        self.punct = None
+        self.stop_words = None
+        self.descr = None
+        self.lower = None
+        self.nbr_ex = None
+        if params:
+            self.params = params
+            if params['coder']:
+                self.encoding = params['coder']  # one_hot or bag_of_words or tfidf
+            if params['stemming']:
+                self.stemm = params['stemming']
+            if params['lemmatization']:
+                self.lemm = params['lemmatization']
+            if params['misspellings']:
+                self.miss = params['misspellings']
+            if params['punctuation']:
+                self.punct = params['punctuation']
+            if params['stop_words']:
+                self.stop_words = params['stop_words']
+            if params['description']:
+                self.descr = params['description']
+            if params['lower_case']:
+                self.lower = params['lower_case']
+            if params['chose_example']:
+                self.nbr_ex = params['chose_example']
         self.df = None
         self.vector = None
         self.corpus = None
@@ -203,7 +222,12 @@ class Preprocessing:
 
 if __name__ == "__main__":
     path = './data/'
+    if not os.path.exists("datasets"):
+        os.mkdir("datasets")
     for config in params:
         prep = Preprocessing(path_data=path,
                              params=params[config])
         prep.run_preprocessing()
+        vector = prep.vector
+        vector.to_csv(f"datasets/{config}.csv")
+        print(f"DataFrame {config} is Done!")
