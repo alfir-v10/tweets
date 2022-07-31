@@ -12,40 +12,52 @@ def find_cosine_similarity(path='./datasets/'):
     if listdir:
         prep = Preprocessing()
         prep.run_preprocessing()
-        sentences = prep.df.iloc[:, 0].to_numpy()
         for file in listdir:
+            print(f"Compute cosine similarity for {file}")
             start_time = time.time()
             vector = pd.read_csv(os.path.join(path, file), index_col=0)
+            # print(vector.shape)
             vector.drop_duplicates(inplace=True)
+            # print(vector.to_numpy())
             df_comp = cosine_similarity(vector.values, vector.values)
+            sentences = prep.df.iloc[vector.index, 0].to_numpy()
+            # print(vector.shape, sentences.shape)
             most_common = []
             for i in range(df_comp.shape[0]):
+                most_tmp = []
                 for j in range(i, df_comp.shape[0]):
                     if 1 > df_comp[i, j] > 0.5 and i != j:
-                        most_common.append([df_comp[i, j], (i, j)])
+                        most_tmp.append([df_comp[i, j], (i, j)])
+                if most_tmp:
+                    most_sim = sorted(most_tmp, key=lambda x: x[0], reverse=True)[0]
+                    most_common.append(most_sim)
             most_common = sorted(most_common, key=lambda x: x[0], reverse=True)[:10]
 
-            if not os.path.exists("most_common.csv"):
-                with open("most_common.csv", 'w') as f:
+            file_name = "most_common.csv"
+            if not os.path.exists(file_name):
+                with open(file_name, 'w') as f:
                     f.write("approach, sentences_one, sentences_two, cosine_similarity\n")
 
-            with open(f"most_common.csv", 'a') as f:
+            with open(file_name, 'a') as f:
                 for mc in most_common:
                     sim, (i, j) = mc
                     f.write(f"{file}_pair, {sentences[i]}, {sentences[j]}, {sim}\n")
+            print(f"Most common similarity for {file} is write on {file_name}!")
             print(file, time.time() - start_time)
 
 
 if __name__ == "__main__":
     path = './datasets/'
 
+    # if os.path.exists("most_common.csv"):
+    #     df = pd.read_csv("most_common.csv", index_col=0, header=0)
+    #     for i in range(10):
+    #         print(df.iloc[i, :])
+    # else:
+    #     find_cosine_similarity(path)
     if os.path.exists("most_common.csv"):
-        df = pd.read_csv("most_common.csv", index_col=0, header=0)
-        for i in range(10):
-            print(df.iloc[i, :])
-    else:
-        find_cosine_similarity(path)
-
+        os.remove("most_common.csv")
+    find_cosine_similarity(path)
     """
     path = './data/'
     save_sim = {}

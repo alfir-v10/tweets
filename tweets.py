@@ -71,7 +71,7 @@ if __name__ == "__main__":
             vector.to_csv(f"datasets/{config}.csv")
             result = {}
             for model in models:
-                start_time_model = time.process_time()
+                start_time_model = time.time()
                 print(f"Running {model.__name__} on dataset by {prep.descr}")
                 x_data = vector.iloc[:, 1:].values
                 y_data = vector.iloc[:, 0].values
@@ -90,7 +90,7 @@ if __name__ == "__main__":
                 y_pred = onehot_encoder.fit_transform(y_pred.reshape(len(y_pred), 1))
                 score = roc_auc_score(y_test, y_pred, multi_class='ovr')
                 print('Test roc_auc_score: ', round(score, 3))
-                diff_time = time.process_time() - start_time_model
+                diff_time = time.time() - start_time_model
                 result.update({model.__name__: score})
 
                 if not os.path.exists("time_running.txt"):

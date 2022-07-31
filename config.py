@@ -1,6 +1,7 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
+from sklearn.svm import SVC
 from xgboost import XGBClassifier
 from catboost import CatBoostClassifier
 import numpy as np
@@ -74,17 +75,17 @@ params = {
         'lower_case': True,
         'description': '0 or 1, if the word exist + lemmatization + misspellings'
     },
-    '05': {
-        'coder': 'one_hot',
-        'stemming': True,
-        'lemmatization': True,
-        'misspellings': True,
-        'chose_example': None,
-        'stop_words': True,
-        'punctuation': True,
-        'lower_case': True,
-        'description': '0 or 1, if the word exist + any other ideas of preprocessing'
-    },
+    # '05': {
+    #     'coder': 'one_hot',
+    #     'stemming': True,
+    #     'lemmatization': True,
+    #     'misspellings': True,
+    #     'chose_example': None,
+    #     'stop_words': True,
+    #     'punctuation': True,
+    #     'lower_case': True,
+    #     'description': '0 or 1, if the word exist + any other ideas of preprocessing'
+    # },
 
     # bag_of_words
     '10': {
@@ -142,17 +143,17 @@ params = {
         'lower_case': True,
         'description': 'bag_of_words + lemmatization + misspellings'
     },
-    '15': {
-        'coder': 'bag_of_words',
-        'stemming': True,
-        'chose_example': None,
-        'lemmatization': True,
-        'misspellings': True,
-        'stop_words': True,
-        'punctuation': True,
-        'lower_case': True,
-        'description': 'bag_of_words + any other ideas of preprocessing'
-    },
+    # '15': {
+    #     'coder': 'bag_of_words',
+    #     'stemming': True,
+    #     'chose_example': None,
+    #     'lemmatization': True,
+    #     'misspellings': True,
+    #     'stop_words': True,
+    #     'punctuation': True,
+    #     'lower_case': True,
+    #     'description': 'bag_of_words + any other ideas of preprocessing'
+    # },
 
     # tfidf
     '20': {
@@ -210,17 +211,17 @@ params = {
         'lower_case': True,
         'description': 'TFIDF + lemmatization + misspellings'
     },
-    '25': {
-        'coder': 'tfidf',
-        'stemming': False,
-        'lemmatization': True,
-        'misspellings': True,
-        'stop_words': True,
-        'punctuation': True,
-        'lower_case': True,
-        'chose_example': None,
-        'description': 'TFIDF + any other ideas of preprocessing'
-    },
+    # '25': {
+    #     'coder': 'tfidf',
+    #     'stemming': False,
+    #     'lemmatization': True,
+    #     'misspellings': True,
+    #     'stop_words': True,
+    #     'punctuation': True,
+    #     'lower_case': True,
+    #     'chose_example': None,
+    #     'description': 'TFIDF + any other ideas of preprocessing'
+    # },
 }
 
 models = {
@@ -229,8 +230,8 @@ models = {
                 'param_grid':
                     {
                         'penalty': ['l2'],
-                        'C': [0.1, 1, 2], # 0.5, 1, 2
-                        'max_iter': [50, 100, 200], # 100, 200
+                        'C': [0.01, 0.1, 1,], # 0.5, 1, 2
+                        'max_iter': [25, 50, 100], # 100, 200
                         'multi_class': ['ovr', ],
                     },
             },
@@ -238,41 +239,41 @@ models = {
             {
                 'param_grid': {
                     'criterion': ['gini', 'entropy', 'log_loss'], #'entropy', 'log_loss'
-                    'max_depth': [10, 20, 30], #20, 30
+                    'max_depth': [3, 5, 10], #20, 30
                     'min_samples_split': [2, 4, 6], #4, 6
                     'min_samples_leaf': [1, 3, 5] #3, 5
                 }
             },
-        # RandomForestClassifier:
-        #     {
-        #         'param_grid': {
-        #             "n_estimators": [100, 200, 300], #
-        #             "criterion": ['gini', 'entropy', 'log_loss'], #'entropy', 'log_loss'
-        #             "max_depth": [10, 20, 30], #20, 30
-        #             'min_samples_split': [2, 4, 6], #4, 6
-        #             'min_samples_leaf': [1, 3, 5], #3, 5
-        #         }
-        #     },
-        # GradientBoostingClassifier:
-        #     {
-        #         'param_grid':
-        #             {
-        #                 "loss": ["log_loss", 'deviance', 'exponential'], #'deviance', 'exponential'
-        #                 "learning_rate" : [0.1, 0.05, 0.01],
-        #                 "n_estimators" : [100, 200, 300],
-        #                 "criterion": ['friedman_mse', "squared_error", "mse"], # squared_error, mse
-        #                 "min_samples_split": [2, 4, 6],#
-        #                 "min_samples_leaf": [1, 3, 5],  #
-        #                 "max_depth": [3, 6, 9],  #
-        #                 "n_iter_no_change": [3,],  #
-        #             }
-        #     },
-        # XGBClassifier:
-        #     {
-        #         'param_grid': {
-        #             'max_depth': [2, 4, 8],
-        #             'n_estimators': [60, 120, 180],
-        #             'learning_rate': [0.1, 0.05, 0.01],
-        #         }
-        #     },
+        RandomForestClassifier:
+            {
+                'param_grid': {
+                    "n_estimators": [50, 100, 200, 300], #
+                    "criterion": ['gini'], #'entropy', 'log_loss'
+                    "max_depth": [3, 4, 6], #20, 30
+                    'min_samples_split': [2, 4, 6], #4, 6
+                    'min_samples_leaf': [1,3, 5], #3, 5
+                }
+            },
+        GradientBoostingClassifier:
+            {
+                'param_grid':
+                    {
+                        "loss": ["log_loss", 'deviance', 'exponential'], #'deviance', 'exponential'
+                        "learning_rate" : [0.1, 0.05, 0.01],
+                        "n_estimators" : [100, 200, 300],
+                        "criterion": ['friedman_mse', "squared_error", "mse"], # squared_error, mse
+                        "min_samples_split": [2, 4, 6],#
+                        "min_samples_leaf": [1, 3, 5],  #
+                        "max_depth": [3, 6, 9],  #
+                        "n_iter_no_change": [3,],  #
+                    }
+            },
+        XGBClassifier:
+            {
+                'param_grid': {
+                    'max_depth': [2, ],
+                    'n_estimators': [60, ],
+                    'learning_rate': [0.1, ],
+                }
+            },
 }

@@ -64,9 +64,9 @@ class Preprocessing:
 
     def _time_execution(func_name):
         def print_time(self, *args):
-            start_time = time.process_time()
+            start_time = time.time()
             func_name(self, *args)
-            end_time = time.process_time()
+            end_time = time.time()
             print(f"{C_RED}Elapsed time during the whole {func_name.__name__} in seconds: {C_END}", end_time-start_time)
         return print_time
 
@@ -75,11 +75,11 @@ class Preprocessing:
             if isinstance(self.nbr_ex, int) and 0 <= self.nbr_ex < self.df.shape[0]:
                 print(f"{C_BLUE}Before {func_name.__name__}: {C_END}", self.df.iloc[self.nbr_ex, 2])
             # print(f"{when} {name}: ", )
-            start_time = time.process_time()
+            start_time = time.time()
             func_name(self, *args)
             if isinstance(self.nbr_ex, int) and 0 <= self.nbr_ex < self.df.shape[0]:
                 print(f"{C_GREEN}After {func_name.__name__}: {C_END}", self.df.iloc[self.nbr_ex, 2])
-            end_time = time.process_time()
+            end_time = time.time()
             print(f"{C_RED}Elapsed time during the whole {func_name.__name__} in seconds: {C_END}", end_time-start_time)
         return print_example
 
@@ -99,7 +99,7 @@ class Preprocessing:
     def run_punctuation(self):
         self.df.iloc[:, 2] = self.df.iloc[:, 2].agg(lambda text: ["".join([c for c in word
                                                                            if (c in string.ascii_letters)
-                                                                           or (c in string.digits)
+                                                                           # or (c in string.digits)
                                                                            or (c in string.whitespace)])
                                                                   for word in text])
         self.df.iloc[:, 2] = self.df.iloc[:, 2].agg(lambda text: [word for word in text
@@ -187,8 +187,9 @@ class Preprocessing:
         if self.encoding == 'tfidf':
             self.tfidf_encoding()
 
-    @_time_execution
     def run_preprocessing(self):
+        print("Run preprocessing... Please wait...")
+        start_time = time.time()
         self.read_file()
         self.run_tokenazation()
         if self.descr:
@@ -218,6 +219,7 @@ class Preprocessing:
             self.run_lemmatization()
         if self.encoding:
             self.run_encoding()
+        print(f"Preprocessing done! Execution time: {time.time() - start_time}")
 
 
 if __name__ == "__main__":
@@ -225,9 +227,12 @@ if __name__ == "__main__":
     if not os.path.exists("datasets"):
         os.mkdir("datasets")
     for config in params:
-        prep = Preprocessing(path_data=path,
-                             params=params[config])
-        prep.run_preprocessing()
-        vector = prep.vector
-        vector.to_csv(f"datasets/{config}.csv")
-        print(f"DataFrame {config} is Done!")
+        if not os.path.exists(f"datasets/{config}.csv"):
+            prep = Preprocessing(path_data=path,
+                                 params=params[config])
+            prep.run_preprocessing()
+            vector = prep.vector
+            vector.to_csv(f"datasets/{config}.csv")
+            print(f"DataFrame {config} is Done!")
+        else:
+            print(f"File datasets/{config}.csv already exists!")
